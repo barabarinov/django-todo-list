@@ -1,3 +1,4 @@
+from django.http import HttpRequest, HttpResponse, HttpResponseRedirect
 from django.urls import reverse_lazy
 from django.views.generic import ListView, CreateView, UpdateView, DeleteView
 
@@ -7,7 +8,7 @@ from tasks.models import Task, Tag
 
 class TaskListView(ListView):
     model = Task
-    ordering = ["-created_at", "is_done"]
+    ordering = ["is_done", "-created_at", ]
 
 
 class TaskCreateView(CreateView):
@@ -47,3 +48,11 @@ class TagUpdateView(UpdateView):
 class TagDeleteView(DeleteView):
     model = Tag
     success_url = reverse_lazy("tasks:tag-list")
+
+
+def toggle_task_status(request: HttpRequest, pk: int) -> HttpResponseRedirect:
+    task = Task.objects.get(pk=pk)
+    task.is_done = not task.is_done
+    task.save()
+
+    return HttpResponseRedirect(reverse_lazy("tasks:index"))
