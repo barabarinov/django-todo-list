@@ -9,30 +9,48 @@
   {% if task_list %}
 
     <div class="task-info">
+
       {% for task in task_list %}
         <div class="task">
-          <div>
-            <p class="fw-bold">- {{ task.content }}
+          <div class="d-flex justify-content-between align-items-center border-bottom">
+
+            <p>
+              <span class="fw-bold">Task:</span> {{ task.content }}
               {% if task.is_done %}
-                <span class="text-success">Done</span>
+                <span class="fw-bold text-success">Done</span>
               {% else %}
-                <span class="text-danger">Not done</span>
+                <span class="fw-bold text-danger">Not done</span>
               {% endif %}
-              <a href=""></a>
             </p>
+
+            {% if task.is_done %}
+              <a class="btn btn-danger" href="{% url 'tasks:toggle-task-status' pk=task.pk %}">Undo</a>
+            {% else %}
+              <a class="btn btn-success " href="{% url 'tasks:toggle-task-status' pk=task.pk %}">Complete</a>
+            {% endif %}
+
           </div>
 
-          <p>Created at: {{ task.created_at }}</p>
+          <p>
+            <span class="fw-bold">Created at:</span> {{ task.created_at }}
+          </p>
+
           {% if task.deadline %}
-            <p>Deadline: {{ task.deadline }}</p>
+            <p>
+              <span class="fw-bold">Deadline:</span> {{ task.deadline }}
+            </p>
           {% endif %}
-          <p>Tags:
+
+          <p>
+            <span class="fw-bold">Tags:</span>
             {% for tag in task.tags.all %}
               {{ tag.name }}
             {% endfor %}
           </p>
+
           <a class="btn btn-warning" href="{% url 'tasks:task-update' pk=task.id %}">Update</a>
           <a class="btn btn-danger" href="{% url 'tasks:task-delete' pk=task.id %}">Delete</a>
+
         </div>
         <hr>
       {% endfor %}
