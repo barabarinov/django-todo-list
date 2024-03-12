@@ -1,4 +1,5 @@
-from django.http import HttpRequest, HttpResponse, HttpResponseRedirect
+from django.http import HttpRequest, HttpResponseRedirect
+from django.shortcuts import get_object_or_404
 from django.urls import reverse_lazy
 from django.views.generic import ListView, CreateView, UpdateView, DeleteView
 
@@ -8,7 +9,13 @@ from tasks.models import Task, Tag
 
 class TaskListView(ListView):
     model = Task
-    ordering = ["is_done", "-created_at", ]
+    ordering = [
+        "is_done",
+        "-created_at",
+    ]
+    queryset = Task.objects.prefetch_related("tags").order_by(
+        "is_done", "-created_at"
+    )
 
 
 class TaskCreateView(CreateView):
@@ -51,7 +58,7 @@ class TagDeleteView(DeleteView):
 
 
 def toggle_task_status(request: HttpRequest, pk: int) -> HttpResponseRedirect:
-    task = Task.objects.get(pk=pk)
+    task = get_object_or_404(Task, pk=pk)
     task.is_done = not task.is_done
     task.save()
 
